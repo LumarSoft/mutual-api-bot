@@ -16,29 +16,39 @@ const main = async () => {
         flow: adapterFlow,
         provider: adapterProvider,
         database: adapterDB,
-      });
+    });
 
     adapterProvider.server.use(cors({ origin: "*", methods: ["GET", "POST"] }));
     adapterProvider.server.get("/funciona", (req, res) => res.end("Funciona"));
 
     adapterProvider.server.post(
-        "/premio",
+        "/enviar-mensajes",
         handleCtx(async (bot, req, res) => {
-            const contacts = req.body;
-            try {
-                const promises = contacts.map(async (contact: Contact) => {
-                    const name = contact.name;
-                    const phone = Number("549" + contact["tel"]);
-                    const bono = contact.bono;
+            const { phones, ganador } = req.body;
+            console.log(phones);
+            console.log(ganador);
 
-                    const message1 = `Hola ${name}, te informamos que el ganador del sorteo de este mes es el afiliado con numero de bono ${bono}.`;
-                    await bot.sendMessage(phone.toString(), message1, {});
+            if (!Array.isArray(phones) || phones.length === 0) {
+                return res.status(400).send("Formato de datos incorrecto o sin contactos.");
+            }
+
+            try {
+                const promises = phones.map(async (phone) => {
+
+                    const message = `Hola ${phone.apellido}, te escribimos de la mutual de Gendarmería Nacional para informarte que el ganador del sorteo mensual es el cliente número ${ganador[0].cliente}, con el premio ${ganador[0].pre_pen}.`;
+                    const numero = `549${phone.tel}`;
+
+                    await bot.sendMessage(numero, message, {});
+
                 });
+
                 await Promise.all(promises);
+                res.end("Mensajes enviados.");
+
             } catch (error) {
                 console.error("Error al enviar mensajes:", error);
+                res.status(500).send("Error al enviar mensajes");
             }
-            res.end("Mensajes enviados.");
         })
     );
 
