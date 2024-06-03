@@ -1,7 +1,6 @@
 import { createBot, createProvider, createFlow } from "@builderbot/bot";
 import { MemoryDB as Database } from "@builderbot/bot";
 import { BaileysProvider as Provider } from "@builderbot/provider-baileys";
-import { Contact } from "./types/contact";
 import { allFlows } from "./allflows";
 import cors from "cors";
 
