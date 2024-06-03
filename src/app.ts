@@ -84,6 +84,15 @@ const main = async () => {
         });
 
         await Promise.all(promises);
+
+        // Eliminar el archivo después de que todas las promesas se hayan resuelto
+        if (file) {
+          fs.unlink(join("uploads/", file.originalname), (err) => {
+            if (err) console.error("Error al eliminar el archivo:", err);
+            else console.log("Archivo eliminado");
+          });
+        }
+
         res.end("Mensajes enviados");
       } catch (error) {
         console.error("Error en el manejo del mensaje:", error);
